@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  web:
+    build: ./enbnb_backend
+    command: python ./manage.py runserver 0.0.0.0:8000
+    volumes: 
+      - ./enbnb_backend:/usr/src/enbnb_backend/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./enbnb_backend/.env.dev
+    depends_on:
+      - db
+  db: 
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_PASSWORD=postgrespassword
+      - POSTGRES_DB=enbnb
+      
+volumes:
+  postgres_data: 
