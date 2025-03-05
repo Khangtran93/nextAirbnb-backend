@@ -3,7 +3,8 @@ import json
 from django.db import IntegrityError
 from django.forms import ValidationError
 from django.http import JsonResponse
-
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
 from useraccount.models import User
@@ -69,12 +70,13 @@ def property_list(request):
   })
 
 @api_view(['GET'])
-@authentication_classes([])
-@permission_classes([])
+@authentication_classes([JWTAuthentication])
+@permission_classes([AllowAny])
 def get_property_details(request, pk):
   print("=============pk============", pk)
+  print('===========request.user_id============', request.user.id)
   property = Property.objects.get(pk=pk)
-  serializer = PropertyDetailsSerializer(property, many=False)
+  serializer = PropertyDetailsSerializer(property, context={'request': request}, many=False)
 
   if property:
     print("data", serializer.data)

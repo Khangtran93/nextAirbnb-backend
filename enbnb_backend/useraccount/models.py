@@ -4,6 +4,8 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.db import models
 
+# from property.models import Property
+
 class CustomUserManager(UserManager):
   def _create_user(self, name, email, password, **extra_fields):
     if not email:
@@ -25,12 +27,21 @@ class CustomUserManager(UserManager):
     extra_fields.setdefault("is_staff", True)
     extra_fields.setdefault("is_superuser", True)
     return self._create_user(name, email, password, **extra_fields)
+
+# class Favorite(models.Model):
+#   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#   user = models.ForeignKey('useraccount.User', related_name='user_favorites', on_delete=models.CASCADE) 
+#   property = models.ForeignKey('property.Property', on_delete=models.CASCADE)
   
+#   class Meta:
+#     unique_together = ('user', 'property')
+
 class User(AbstractBaseUser, PermissionsMixin):
   id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
   email = models.EmailField(unique=True)
   name = models.CharField(max_length=255, blank=True, null=True)
   avatar = models.ImageField(upload_to='uploads/avatar')
+  favorite = models.ManyToManyField('property.Property', related_name='favorite_by',blank=True)
 
   is_active = models.BooleanField(default=True)
   is_superuser = models.BooleanField(default=False)
