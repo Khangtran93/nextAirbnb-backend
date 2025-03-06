@@ -25,6 +25,14 @@ class PropertyImageListSerializer(serializers.ModelSerializer):
 class PropertyDetailsSerializer(serializers.ModelSerializer):
   landlord = UserDetailsSerializer(read_only=True)
   images = PropertyImageListSerializer(many=True, read_only=True)
+  is_favorite = serializers.SerializerMethodField()
+
+  def get_is_favorite(self, obj):
+    request = self.context.get('request') 
+    user = request.user if request and request.user.is_authenticated else None
+    if user:
+      return user.favorite.filter(id=obj.id).exists()
+    return False
   class Meta:
     model = Property
     fields = (
@@ -39,7 +47,8 @@ class PropertyDetailsSerializer(serializers.ModelSerializer):
               'country_code',
               # 'image_url',
               'landlord',
-              'images'
+              'images',
+              'is_favorite'
     )
 
 class ReservationListSerializer(serializers.ModelSerializer):

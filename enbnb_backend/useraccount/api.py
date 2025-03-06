@@ -1,5 +1,8 @@
+from csv import Error
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import JsonResponse
+
+from property.models import Property
 from .serializers import UserDetailsSerializer
 from useraccount.models import User
 
@@ -20,3 +23,19 @@ def get_host_details(request, pk):
   return JsonResponse({
     'data': serializer.data
   })
+
+@api_view(['POST'])
+def toggle_favorite(request, pk):
+  try:
+    user = User.objects.get(pk=request.user.id)
+    has_property = user.favorite.filter(id=pk).exists()
+    if has_property:
+      user.favorite.remove(pk)
+      return JsonResponse({'message': 'Removed favorite property'}, status=200) 
+    else:
+      user.favorite.add(pk)
+      return JsonResponse({'message': 'Added favorite property'}, status=200)
+  except Error:
+    return JsonResponse({'error': 'failed to create favorite'}, status=500)
+
+  
