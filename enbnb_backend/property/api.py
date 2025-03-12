@@ -185,11 +185,22 @@ def get_property_reservations(request, pk):
 @api_view(['GET'])
 def get_user_reservations(request):
   user = request.user
-  print('user', user.id)
   reservations = Reservations.objects.filter(customer=request.user.id).select_related('customer', 'property')
   for res in reservations:
     print('customer name', res.customer.name)
   serializer = ReservationListSerializer(reservations, many=True)
   return JsonResponse({'data': serializer.data})
 
-  
+@api_view(['GET'])
+def get_favorite_properties(request):
+  try:
+    user = User.objects.get(pk=request.user.id)
+    favorites = user.favorite.all()
+    if favorites:
+      serializer = PropertyDetailsSerializer(favorites, many=True)
+      return JsonResponse({'data': serializer.data})
+    else:
+      return JsonResponse({'message': 'No favorite properties found.'}, status=200)
+
+  except User.DoesNotExist:
+    return JsonResponse({'error': 'User not found.'}, status=404)
