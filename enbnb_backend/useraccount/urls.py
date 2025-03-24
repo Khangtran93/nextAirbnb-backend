@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import TokenVerifyView
 from . import api
 
 urlpatterns = [
-  path('register/', RegisterView.as_view(), name='user_register'),
+  path('register/', api.CustomRegisterView.as_view(), name='user_register'),
   path('login/', LoginView.as_view(), name='user_login'),
   path('logout/', LogoutView.as_view(), name='user_logout'),
   path('<uuid:pk>/', api.get_host_details, name='get_host_details'),
