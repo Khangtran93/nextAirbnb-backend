@@ -16,11 +16,7 @@ from .serializers import PropertyListSerializer, PropertyDetailsSerializer, Rese
 
 @api_view(['POST', 'FILES'])
 def create_property(request):
-  # print("==========POST==============", request.body)
-  # data = json.loads(request.body)
-  # print("==========POST==============", request.body)
   data = PropertyModelForm(request.POST, request.FILES)
-  # data = request.data
   print("===============data type===========", type(data))
   print("===============data=============", data)
   images = request.FILES.getlist("image")

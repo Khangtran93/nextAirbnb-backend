@@ -1,12 +1,13 @@
 from csv import Error
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import JsonResponse
-
+from dj_rest_auth.registration.views import RegisterView
 from property.models import Property
-from .serializers import UserDetailsSerializer
+from .serializers import CustomRegisterSerializer, UserDetailsSerializer
 from useraccount.models import User
 
-
+class CustomRegisterView(RegisterView):
+  serializer_class = CustomRegisterSerializer
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
