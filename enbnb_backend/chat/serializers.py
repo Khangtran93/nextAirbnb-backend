@@ -24,16 +24,32 @@ class ConversationListSerializer(serializers.ModelSerializer):
     model = Conversation
     fields = ('id', 'sender', 'receivers')
 
+class ConversationDetailSerializer(serializers.ModelSerializer):
+  print("Got ConversationDetailSerializer")
+  users = serializers.SerializerMethodField()
+  messages = serializers.SerializerMethodField()
+
+  def get_messages(self, obj):
+    messages = obj.messages.all()
+    messages_serializer = MessageSerializer(messages, many=True)
+    return messages_serializer.data
+
+  def get_users(self, obj):
+    users = obj.users.all()
+    return UserDetailsSerializer(users, many=True).data
+  
+  class Meta:
+    model = Conversation
+    fields = ('id', 'users','messages')
 class MessageSerializer(serializers.ModelSerializer):
-  sender = UserDetailsSerializer(many=False, read_only=True)
-  receiver = UserDetailsSerializer(many=False, read_only=True)
+  sender = UserDetailsSerializer(many=False)
   class Meta:
     model = Message
     fields = (
-      'id',
+      # 'id',
       'conversation',
       'body',
       'sender',
-      'receiver',
+      # 'receiver',
       'created_at',
     )

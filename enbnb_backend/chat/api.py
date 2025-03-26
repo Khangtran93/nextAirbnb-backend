@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from django.http import JsonResponse
 
 from chat.models import Conversation
-from chat.serializers import ConversationListSerializer, MessageSerializer
+from chat.serializers import ConversationListSerializer, ConversationDetailSerializer
 from useraccount.models import User
 
 @api_view(['GET'])
@@ -15,11 +15,11 @@ def get_conversations(request):
 
 @api_view(['GET'])
 def get_messages(request, pk):
-  print("====pk====", pk)
+  print("====pk in get messages====", pk)
   try:
     conversation = Conversation.objects.get(pk=pk)
-    messages = conversation.messages.all()
-    serializer = MessageSerializer(messages, many=True)
+    # messages = conversation.messages.all()
+    serializer = ConversationDetailSerializer(conversation, many=False)
   except Conversation.DoesNotExist:
     return JsonResponse({'error': 'Conversation not found'}, status=404)
-  return JsonResponse({'message': serializer.data})
+  return JsonResponse({'data': serializer.data})
