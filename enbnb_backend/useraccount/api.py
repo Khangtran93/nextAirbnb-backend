@@ -12,9 +12,10 @@ class CustomRegisterView(RegisterView):
 @authentication_classes([])
 @permission_classes([])
 def get_host_details(request, pk):
+  print("getting host details")
   try: 
     host = User.objects.get(pk=pk)
-    serializer = UserDetailsSerializer(host, many=False)
+    serializer = UserDetailsSerializer(host, context={"request": request}, many=False)
     print("====host===", serializer.data)
   except User.DoesNotExist:
     return JsonResponse({
