@@ -14,7 +14,7 @@ def get_conversations(request):
   return JsonResponse({'data': serializer.data})
 
 @api_view(['GET'])
-def get_messages(request, pk):
+def get_conversation_details(request, pk):
   print("====pk in get messages====", pk)
   try:
     conversation = Conversation.objects.get(pk=pk)
@@ -23,3 +23,18 @@ def get_messages(request, pk):
   except Conversation.DoesNotExist:
     return JsonResponse({'error': 'Conversation not found'}, status=404)
   return JsonResponse({'data': serializer.data})
+
+@api_view(['GET'])
+def conversation_start(request, landlord_id):
+  print("======getting conversation id =====")
+  if request.user.id == landlord_id:
+    return JsonResponse({'error': 'You cannot start a conversation with yourself'}, status=400)
+  try:
+    conversation = Conversation.objects.all().filter(users__in=[request.user.id]).filter(users__in=[landlord_id]).first()
+    if not conversation: 
+      landlord = User.objects.get(id=landlord_id)
+      conversation = Conversation.objects.create()
+      conversation.users.add(request.user, landlord)
+    return JsonResponse({'id': conversation.id})
+  except Conversation.DoesNotExist:
+    return JsonResponse({'error': 'Conversation not found'}, status=404)

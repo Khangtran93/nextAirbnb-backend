@@ -4,6 +4,8 @@ from pydoc import text
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from chat.models import Message
+
 class ChatConsumer(AsyncWebsocketConsumer):
   async def connect(self):
     self.room_name = self.scope['url_route']['kwargs']['room_name']
@@ -46,6 +48,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
       }
     )
 
+    await self.save_message(conversation_id, receiver_id, body)
+
   # send messages
   async def chat_message(self, event):
     conversation_id = event['conversation_id']
@@ -62,3 +66,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
       'name': name,
       'body': body,
     }))
+
+  @sync_to_async
+  def save_message(self, conversation_id, receiver_id, body):
+    user = self.scope['user']
+
+    message = Message.objects.create(conversation_id=conversation_id, body=body, sender=user, receiver_id=receiver_id)

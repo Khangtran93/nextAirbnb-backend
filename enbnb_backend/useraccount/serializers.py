@@ -15,9 +15,15 @@ class CustomRegisterSerializer(RegisterSerializer):
         return user
 class UserDetailsSerializer(serializers.ModelSerializer):
   year_experience = serializers.SerializerMethodField()
+  # avatar = serializers.SerializerMethodField()
 
   def get_year_experience(self, obj):
     return (datetime.today().year + 1) - obj.created_at.year
+  
+  # def get_avatar(self, obj):
+  #     if obj.avatar:  # Ensure avatar is set
+  #         return self.context['request'].build_absolute_uri(obj.avatar.url)
+  #     return None 
   class Meta:
     model = User
     fields = (
